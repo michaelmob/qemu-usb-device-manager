@@ -1,0 +1,13 @@
+{
+	"usb-devices": {
+		"#inactive-item": "1d33:d622",
+		"keyboard": "1b1c:1b09",
+		"mouse": "046d:c52b"
+	},
+
+	"virtual-machines": {
+		"windows-vm-1": {
+			"monitor": "127.0.0.1:7101"
+		}
+	}
+}
