@@ -9,8 +9,11 @@ This limited monitor wrapper connects to a QEMU monitor through a Telnet socket 
 
 ## Getting Started
 1. Clone this repository somewhere on your host machine and virtual machine. Or preferably into a shared directory.
-2. Modify config.json to your likings.
-3. Run `run.py` with desired arguments.
+2. Modify your QEMU command or libvirt config to use a telnet server as its monitor. \*\*
+3. Modify config.json to your likings.
+4. Run `run.py` with desired arguments.
+
+\*\* `-monitor telnet:0.0.0.0:7101,server,nowait,nodelay`
 
 ##### Arguments
 * `--name [name]` use config for this virtual machine  
