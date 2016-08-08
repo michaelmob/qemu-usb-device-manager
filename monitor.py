@@ -106,7 +106,6 @@ class Monitor(object):
 				_id = self.default_usb_type(_id)
 				if not self.id_is_connected(_id, data):
 					self.__write("usb_add %s" % _id)
-					print("usb_add %s" % _id)
 				else:
 					result = False
 
