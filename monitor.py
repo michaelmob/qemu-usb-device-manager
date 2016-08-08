@@ -83,21 +83,20 @@ class Monitor(object):
 			self.is_connected = False
 
 
-	def add_usb(self, device, no_duplicates=True):
-		"""Add USB device by vendor:product id 
+	def add_usb(self, device):
+		"""Add USB device by vendor:product id
+		Verify that device is not already added
 		
 		Args:
 		    device (str): Device ID
-		    no_duplicates (str): Check that USB device isn't already added
 		"""
-		if no_duplicates:
-			data = self.usb_devices_more()
+		data = self.usb_devices_more()
 
 		result = True
 
 		if type(device) is str:
 			device = self.default_usb_type(device)
-			if not (no_duplicates and self.id_is_connected(device)):
+			if not self.id_is_connected(device):
 				self.__write("usb_add %s" % device)
 			else:
 				return False
@@ -105,8 +104,9 @@ class Monitor(object):
 		elif type(device) is list:
 			for _id in device:
 				_id = self.default_usb_type(_id)
-				if not (no_duplicates and self.id_is_connected(_id)):
+				if not self.id_is_connected(_id, data):
 					self.__write("usb_add %s" % _id)
+					print("usb_add %s" % _id)
 				else:
 					result = False
 
