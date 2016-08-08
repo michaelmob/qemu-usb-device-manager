@@ -2,7 +2,8 @@
 	"usb-devices": {
 		"disabled-device": {
 			"id": "1d33:d622",
-			"action": "disabled"
+			"action": "disabled",
+			"comment": "Optional comment"
 		},
 		"keyboard": {
 			"id": "1b1c:1b09"

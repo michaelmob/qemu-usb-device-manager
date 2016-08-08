@@ -8,10 +8,11 @@ Most useful when paired with a hotkey manager.
 This limited monitor wrapper connects to a QEMU monitor through a Telnet socket per command. When adding a USB device it is made sure that the device ID is not already connected to the device. It also gives the ability to remove devices by their vendor:product ID and by specified name. Along that, it shows detailed information about USB devices connected to the host machine, and virtual machine, making it a breeze to figure out which devices to add.
 
 ## Getting Started
-1. Clone this repository somewhere on your host machine and virtual machine. Or preferably into a shared directory.
-2. Modify your QEMU command or libvirt config to use a telnet server as its monitor. \*\*
-3. Modify config.json to your likings.
-4. Run `run.py` with desired arguments.
+1. Install Python 3.5+
+2. Clone this repository somewhere on your host machine and virtual machine. Or preferably into a shared directory.
+3. Modify your QEMU command or libvirt config to use a telnet server as its monitor. \*\*
+4. Modify config.json to your likings.
+5. Run `run.py` with desired arguments.
 
 \*\* `-monitor telnet:0.0.0.0:7101,server,nowait,nodelay`
 
@@ -40,14 +41,15 @@ Type `help` in console for a list of console commands
 
 ##### Examples
 ######Configuration
-```json
-// Python's JSON Decoder is VERY strict, look at _config.json for a working
+```yaml
+// The JSON standard does not allow comments, look at _config.json for a working
 // configuration without comments
 {
 	"usb-devices": {
 		"disabled-device": {
 			"id": "1d33:d622", // Vendor:Product ID, can also include "host:"
-			"action": "disabled" // Device will be ignored
+			"action": "disabled", // Device will be ignored
+			"comment": "Optional comment for a real config file"
 		},
 		"keyboard": {
 			"id": "1b1c:1b09"
@@ -70,6 +72,7 @@ Type `help` in console for a list of console commands
 ```
 
 Add all usb-devices, except for "disabled-item"  
+`--localhost gateway` will replace localhost with your gateway IP. This should only be used on your VM if its suitable.  
 `run.py --name windows-vm-1 --localhost gateway --command add exit`
 
 Remove all usb-devices, except for "mic" which "action" is "add only"  
