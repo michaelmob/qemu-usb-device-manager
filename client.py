@@ -47,7 +47,8 @@ class Client(object):
 
 		# Get useful info from config
 		self.usb_devices_full = {
-			k: v for k, v in _dict["usb-devices"].items() if k[0] != "#"
+			k: v for k, v in _dict["usb-devices"].items()
+				if v.get("action") != "disabled"
 		}
 		self.usb_devices = list(self.usb_devices_full.values())
 		self.vm_names = list(_dict["virtual-machines"].keys())
@@ -87,12 +88,19 @@ class Client(object):
 
 
 	def device_names_to_ids(self, devices):
-		"""Lookup list of device IDs from usb_devices
+		"""Create list of devices by searching for 'devices' values and trying
+		to find 'usb_devices_full' keys with them, otherwise use same value
 		
 		Args:
 		    devices (list): List of devices
 		"""
-		return [self.usb_devices_full.get(device, device) for device in devices]
+		result = []
+
+		for device in devices:
+			name = self.usb_devices_full.get(device)
+			result.append(name.get("id") if name else device)
+
+		return result
 
 
 	def parse_command(self, text):
@@ -270,7 +278,10 @@ class Client(object):
 		"""
 		# Add all USB devices
 		if not args:
-			args = self.usb_devices
+			args = [  # Only add devices without the action of "remove only"
+				device["id"] for device in self.usb_devices
+					if device.get("action") != "remove only"
+			]
 		else:
 			args = self.device_names_to_ids(args)
 		
@@ -287,7 +298,10 @@ class Client(object):
 		"""
 		# Remove all USB devices
 		if not args:
-			args = self.usb_devices
+			args = [  # Only add devices without the action of "add only"
+				device["id"] for device in self.usb_devices
+					if device.get("action") != "add only"
+			]
 		else:
 			args = self.device_names_to_ids(args)
 

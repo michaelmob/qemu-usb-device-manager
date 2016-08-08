@@ -93,6 +93,8 @@ class Monitor(object):
 		if no_duplicates:
 			data = self.usb_devices_more()
 
+		result = True
+
 		if type(device) is str:
 			device = self.default_usb_type(device)
 			if not (no_duplicates and self.id_is_connected(device)):
@@ -106,9 +108,9 @@ class Monitor(object):
 				if not (no_duplicates and self.id_is_connected(_id)):
 					self.__write("usb_add %s" % _id)
 				else:
-					return False
+					result = False
 
-		return not "could not" in self.__read()
+		return (not "could not" in self.__read()) if result else result
 
 
 	def remove_usb(self, device):

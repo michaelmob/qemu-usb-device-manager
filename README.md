@@ -41,26 +41,42 @@ Type `help` in console for a list of console commands
 ##### Examples
 ######Configuration
 ```json
+// Python's JSON Decoder is VERY strict, look at _config.json for a working
+// configuration without comments
 {
 	"usb-devices": {
-		"#inactive-item": "1d33:d622",
-		"keyboard": "1b1c:1b09",
-		"mouse": "046d:c52b"
+		"disabled-device": {
+			"id": "1d33:d622", // Vendor:Product ID, can also include "host:"
+			"action": "disabled" // Device will be ignored
+		},
+		"keyboard": {
+			"id": "1b1c:1b09"
+		},
+		"mouse": {
+			"id": "046d:c52b"
+		},
+		"mic": {
+			"id": "17a0:0310",
+			"action": "add only" // Only added; must be removed manually
+		}
 	},
 
 	"virtual-machines": {
 		"windows-vm-1": {
-			"monitor": "127.0.0.1:7101"
+			"monitor": "127.0.0.1:7101" // Telnet server
 		}
 	}
 }
 ```
 
-Add all usb-devices, except for :inactive-item" since it starts with a #
+Add all usb-devices, except for "disabled-item"
 `run.py --name windows-vm-1 --localhost gateway --command add exit`
 
-Remove all usb-devices, except for "inactive-item" since it starts with a pound sign
+Remove all usb-devices, except for "mic" which "action" is "add only"
 `run.py --name windows-vm-1 --command remove exit`
+
+"add only" actioned devices can be removed manually
+`run.py --name windows-vm-1 --command "remove mic" exit`
 
 Only add mouse to virtual machine
 `run.py --name windows-vm-1 --command "add mouse" exit`
