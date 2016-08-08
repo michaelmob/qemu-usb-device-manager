@@ -69,19 +69,19 @@ Type `help` in console for a list of console commands
 }
 ```
 
-Add all usb-devices, except for "disabled-item"
+Add all usb-devices, except for "disabled-item"  
 `run.py --name windows-vm-1 --localhost gateway --command add exit`
 
-Remove all usb-devices, except for "mic" which "action" is "add only"
+Remove all usb-devices, except for "mic" which "action" is "add only"  
 `run.py --name windows-vm-1 --command remove exit`
 
-"add only" actioned devices can be removed manually
+"add only" actioned devices can be removed manually  
 `run.py --name windows-vm-1 --command "remove mic" exit`
 
-Only add mouse to virtual machine
+Only add mouse to virtual machine  
 `run.py --name windows-vm-1 --command "add mouse" exit`
 
-Add device by vendor:product id
+Add device by vendor:product id  
 `run.py --name windows-vm-1 --command "add 046d:c52b" exit`
 
 Without `exit` at the end, the console will be left open in interactive mode allowing you to enter more commands.
