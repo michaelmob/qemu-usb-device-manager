@@ -11,8 +11,8 @@ class Client(object):
 		"""Load configuration from json file 
 		
 		Args:
-		    config_filepath (str): Configuration file path
-		    machine_name (str): Virtual machine name
+			config_filepath (str): Configuration file path
+			machine_name (str): Virtual machine name
 		"""
 		self.config_filepath = config_filepath
 		self.machine_name = machine_name
@@ -77,7 +77,7 @@ class Client(object):
 		"""Quick monitor command: Connect, run, disconnect 
 		
 		Args:
-		    func (function): Callback function
+			func (function): Callback function
 		"""
 		if not self.monitor.connect():
 			print("Could not connect to monitor.")
@@ -92,7 +92,7 @@ class Client(object):
 		to find 'usb_devices_full' keys with them, otherwise use same value
 		
 		Args:
-		    devices (list): List of devices
+			devices (list): List of devices
 		"""
 		result = []
 
@@ -107,7 +107,7 @@ class Client(object):
 		"""Split command and args 
 		
 		Args:
-		    text (str): Command
+			text (str): Command
 		"""
 		text = text.split(" ", 1)
 		return (text[0], text[1].split(" ") if len(text) > 1 else None)
@@ -117,7 +117,7 @@ class Client(object):
 		"""Run command for monitor 
 		
 		Args:
-		    text (str): Command
+			text (str): Command
 		"""
 		command, args = self.parse_command(text)
 
@@ -171,7 +171,7 @@ class Client(object):
 		"""List commands 
 		
 		Args:
-		    args (list): List arguments
+			args (list): List arguments
 		"""
 		print("- help - List commands")
 		print("- exit - Exit limited monitor")
@@ -207,7 +207,7 @@ class Client(object):
 		"""Set active machine 
 		
 		Args:
-		    args (list): List arguments
+			args (list): List arguments
 		"""
 		if args:
 			# Backup old name, and reload new one
@@ -236,7 +236,7 @@ class Client(object):
 		"""List USB devices connected to virtual machine 
 		
 		Args:
-		    args (list): List arguments
+			args (list): List arguments
 		"""
 		if not self.monitor.connect():
 			print("Could not connect to monitor.")
@@ -254,7 +254,7 @@ class Client(object):
 		"""List USB devices connected to host 
 		
 		Args:
-		    args (list): List arguments
+			args (list): List arguments
 		"""
 		if not self.monitor.connect():
 			print("Could not connect to monitor.")
@@ -274,7 +274,7 @@ class Client(object):
 		"""Add USB devices 
 		
 		Args:
-		    args (list): List arguments
+			args (list): List arguments
 		"""
 		# Add all USB devices
 		if not args:
@@ -294,7 +294,7 @@ class Client(object):
 		"""Remove USB devices 
 		
 		Args:
-		    args (list): List arguments
+			args (list): List arguments
 		"""
 		# Remove all USB devices
 		if not args:

@@ -12,7 +12,7 @@ class Monitor(object):
 		"""Initializer 
 		
 		Args:
-		    host (str): IP address and Port of Telnet monitor
+			host (str): IP address and Port of Telnet monitor
 		"""
 		host = host.split(":")
 		self.host = (host[0], int(host[1]) if len(host[1]) > 1 else 23)
@@ -22,9 +22,9 @@ class Monitor(object):
 		"""Connect to Telnet monitor 
 		
 		Args:
-		    retry (bool, optional): Attempt retry if connection is not successful
-		    retry_wait (float, optional): Amount of time to wait for retrying
-		    max_retries (int, optional): Maximum amount of retries
+			retry (bool, optional): Attempt retry if connection is not successful
+			retry_wait (float, optional): Amount of time to wait for retrying
+			max_retries (int, optional): Maximum amount of retries
 		"""
 		if self.is_connected:
 			return
@@ -59,7 +59,7 @@ class Monitor(object):
 		"""Write string to monitor 
 		
 		Args:
-		    value (str): Text to write to telnet monitor
+			value (str): Text to write to telnet monitor
 		"""
 		if not self.is_connected:
 			return
@@ -88,7 +88,7 @@ class Monitor(object):
 		Verify that device is not already added
 		
 		Args:
-		    device (str): Device ID
+			device (str): Device ID
 		"""
 		data = self.usb_devices_more()
 
@@ -116,7 +116,7 @@ class Monitor(object):
 		"""Remove USB device by vendor id 
 		
 		Args:
-		    device (str): Device ID
+			device (str): Device ID
 		"""
 		if type(device) is str:
 			self.__write("usb_del %s" % self.id_to_device(device))
@@ -136,10 +136,10 @@ class Monitor(object):
 		automatically be prefixed with "host:"
 		
 		Args:
-		    value (str): Device ID
+			value (str): Device ID
 		
 		Returns:
-		    str: Manipulated device ID
+			str: Manipulated device ID
 		"""
 		if ":" in value:
 			_value = value.split(":")
@@ -154,8 +154,8 @@ class Monitor(object):
 		host device names to connected virtual machine device names.
 		
 		Args:
-		    value (str): Vendor:Product ID
-		    data (bool, optional): Prefetched data of .host_usb_devices_more()
+			value (str): Vendor:Product ID
+			data (bool, optional): Prefetched data of .host_usb_devices_more()
 
 		Returns:
 			Device if found, otherwise it returns original value
@@ -173,8 +173,8 @@ class Monitor(object):
 		"""Find if device is connected by vendor and product id.
 		
 		Args:
-		    value (str): Vendor:Product ID
-		    data (bool, optional): Prefetched data of .host_usb_devices_more()
+			value (str): Vendor:Product ID
+			data (bool, optional): Prefetched data of .host_usb_devices_more()
 
 		Returns:
 			bool, connected or not
