@@ -45,40 +45,40 @@ Type `help` in console for a list of console commands
 // The JSON standard does not allow comments, look at _config.json for a working
 // configuration without comments
 {
-	"usb-devices": {
-		"disabled-device": {
-			"id": "1d33:d622", // Vendor:Product ID, can also include "host:"
-			"action": "disabled", // Device will be ignored
-			"comment": "Optional comment for a real config file"
-		},
-		"keyboard": {
-			"id": "1b1c:1b09"
-		},
-		"mouse": {
-			"id": "046d:c52b"
-		},
-		"mic": {
-			"id": "17a0:0310",
-			"action": "add only" // Only added; must be removed manually
-		}
-	},
+    "usb-devices": {
+        "disabled-device": {
+            "id": "1d33:d622",  // Vendor:Product ID, can also include "host:"
+            "action": "disabled",  // Device will be ignored
+            "comment": "Optional comment for a real config file"
+        },
+        "keyboard": {
+            "id": "1b1c:1b09"
+        },
+        "mouse": {
+            "id": "046d:c52b"
+        },
+        "mic": {
+            "id": "17a0:0310",
+            "action": "add only"  // Only added; must be removed manually
+        }
+    },
 
-	"virtual-machines": {
-		"windows-vm-1": {
-			"monitor": "127.0.0.1:7101" // Telnet server
-		}
-	}
+    "virtual-machines": {
+        "windows-vm-1": {
+            "monitor": "127.0.0.1:7101"  // Telnet server
+        }
+    }
 }
 ```
 
-Add all usb-devices, except for "disabled-item"  
+Add all usb-devices, except for `disabled-item`  
 `--localhost gateway` will replace localhost with your gateway IP. This should only be used on your VM if its suitable.  
 `run.py --name windows-vm-1 --localhost gateway --command add exit`
 
-Remove all usb-devices, except for "mic" which "action" is "add only"  
+Remove all usb-devices, except for `mic` whose `action` is `add only`  
 `run.py --name windows-vm-1 --command remove exit`
 
-"add only" actioned devices can be removed manually  
+"add only" actioned devices must be removed manually  
 `run.py --name windows-vm-1 --command "remove mic" exit`
 
 Only add mouse to virtual machine  
