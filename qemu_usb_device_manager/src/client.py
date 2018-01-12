@@ -7,8 +7,6 @@ from . import constants
 from .monitor import Monitor
 from .utils import get_gateway, download_string
 
-logging.basicConfig(filename="output.log")
-
 
 
 class Client(object):
@@ -16,7 +14,6 @@ class Client(object):
 	Client that interacts with monitor on a higher level.
 	"""
 	required_keys = ("usb-devices", "host-machine", "virtual-machines")
-
 	actions = {
 		"ignore": ("ignore", "ignored", "disable", "disabled"),
 		"add only": ("add only", "addonly", "add_only", "add-only"),
@@ -24,7 +21,7 @@ class Client(object):
 	}
 
 
-	def __init__(self, config_filepath, machine_name):
+	def __init__(self, machine_name, config_filepath, log_filepath=None):
 		"""
 		Load configuration from yaml/json file.
 		
@@ -32,6 +29,10 @@ class Client(object):
 			config_filepath (str): Configuration file path
 			machine_name (str): Virtual machine name
 		"""
+		# Initiate logging
+		if log_filepath:
+			logging.basicConfig(filename=log_filepath)
+
 		self.config_filepath = config_filepath
 		self.machine_name = machine_name
 		self.load_config()
@@ -175,6 +176,10 @@ class Client(object):
 		elif command == "exit" or command == "quit":
 			exit(0)
 
+		# Version
+		elif command == "version":
+			self.command_version(args)
+
 		# Wait
 		elif command == "wait" or command == "sleep":
 			if args: sleep(float(args[0]))
@@ -218,6 +223,16 @@ class Client(object):
 
 		else:
 			print(constants.CLIENT_UNKNOWN_COMMAND)
+
+
+	def command_version(self, args):
+		"""
+		Print version.
+		
+		Args:
+			args (list): List arguments
+		"""
+		print(constants.VERSION)
 
 
 	def command_help(self, args):

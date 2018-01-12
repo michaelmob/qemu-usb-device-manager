@@ -1,3 +1,6 @@
+VERSION = "1.1.0"  # Remember to change version in setup.py too!
+
+
 # Monitor
 MONITOR_NOT_SET = "No monitor set."
 MONITOR_IN_USE = "Monitor is already in use."
@@ -18,7 +21,7 @@ CLIENT_CANNOT_ADD = "Could not add device(s): %s"
 CLIENT_CANNOT_REMOVE = "Could not remove device(s): %s"
 CLIENT_WELCOME = \
 """
-Limited QEMU Monitor Wrapper for USB Switching
+Limited QEMU Monitor Wrapper for USB management
 Type 'help' for a list of commands.
 """.strip()
 CLIENT_HELP = \
