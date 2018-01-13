@@ -1,5 +1,6 @@
 VERSION = "1.1.0"  # Remember to change version in setup.py too!
-
+CONFIG_NAME_SHORT = "config"
+CONFIG_NAME_LONG = "qemu_usb_dm_config"
 
 # Monitor
 MONITOR_NOT_SET = "No monitor set."
@@ -17,6 +18,8 @@ CLIENT_VM_DEVICE = "- ID: %s / Device: %s / %s"
 CLIENT_HOST_DEVICE = "- ID: %s / %s %s"
 CLIENT_DEVICE_CONNECTED = "[Connected]"
 CLIENT_UNKNOWN_COMMAND = "Unknown command. Type 'help' for a list of commands."
+CLIENT_ADDED = "Added device(s): %s"
+CLIENT_REMOVED = "Removed device(s): %s"
 CLIENT_CANNOT_ADD = "Could not add device(s): %s"
 CLIENT_CANNOT_REMOVE = "Could not remove device(s): %s"
 CLIENT_WELCOME = \
@@ -43,11 +46,20 @@ CLIENT_HELP = \
 - remove [id] - Remove USB device by id
 - remove [name] - Remove USB device by specified name
 """.strip()
+CLIENT_INFO = \
+"""
+VERSION: %(VERSION)s
+CONFIG: %(CONFIG_FILEPATH)s
+CURRENT_DIR: %(CURRENT_DIR)s
+HOME_DIR: %(HOME_DIR)s
+BASE_DIR: %(BASE_DIR)s
+""".strip()
 
 
 # Config
 CONFIG_DOES_NOT_EXIST = "Configuration file (%s) does not exist."
 CONFIG_CANNOT_LOAD = "Cannot load configuration.\n%s"
+CONFIG_LOOKED_FOR = "Looked for '%s' in these directories:"
 CONFIG_CANNOT_LOAD_NEW = "Cannot load new configuration."
 CONFIG_CANNOT_RELOAD = "Could not reload configuration file."
 CONFIG_RELOAD = "Reloaded configuration file."

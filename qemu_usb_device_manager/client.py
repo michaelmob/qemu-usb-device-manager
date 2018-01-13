@@ -1,3 +1,4 @@
+import os
 import logging
 import yaml
 from sys import exit
@@ -42,10 +43,11 @@ class Client(object):
 	def load_config(self):
 		"""
 		Load configuration file.
+		** This method needs to be split up and cleaned.
 		"""
 		try:
 			with open(self.config_filepath) as f:
-				full_config = yaml.load(f)
+				self.config = yaml.load(f)
 		except Exception as exc:
 			logging.exception(exc)
 			return False
@@ -55,8 +57,8 @@ class Client(object):
 		
 		# Find missing elements
 		for key in self.required_keys:
-			if not key in full_config.keys():
-				full_config[key] = {}
+			if not key in self.config.keys():
+				self.config[key] = {}
 				rewrite_required = True
 				print(constants.CONFIG_MISSING_ELEMENT % key)
 
@@ -65,22 +67,32 @@ class Client(object):
 			print(constants.CONFIG_REWRITE_MESSAGE)
 			try:
 				with open(self.config_filepath, "w") as f:
-					yaml.dump(full_config, f)
+					yaml.dump(self.config, f)
 			except Exception as exc:
 				print(constants.CONFIG_CANNOT_REWRITE)
 				logging.exception(exc)
 				return False
 			return self.load_config()
 
+		self.configuration_url = self.config.get("configuration-url", None)
+		self.host_config = self.config["host-machine"]
+
+		# Set machine by hostname if not specified
+		if not self.machine_name and not self.is_host_machine():
+			hostname = gethostname()
+			for key, value in self.config["virtual-machines"].items():
+				if "hostname" in value and value["hostname"] == hostname:
+					self.machine_name = key
+
 		# Get useful info from config
 		self.usb_devices_full = {
-			k: v for k, v in full_config["usb-devices"].items()
+			k: v for k, v in self.config["usb-devices"].items()
 				if v.get("action") not in self.actions["ignore"]
 		}
-		self.configuration_url = full_config.get("configuration-url", None)
-		self.host_config = full_config["host-machine"]
-		self.vm_config = full_config["virtual-machines"].get(self.machine_name)
-		self.vm_names = list(full_config["virtual-machines"].keys())
+
+		# VM
+		self.vm_config = self.config["virtual-machines"].get(self.machine_name)
+		self.vm_names = list(self.config["virtual-machines"].keys())
 		self.usb_devices = list(self.usb_devices_full.values())
 
 		# No machine config? No monitor inside machine config? Goodbye.
@@ -101,7 +113,7 @@ class Client(object):
 		default_ip = None
 		if self.host_config.get("ip-address", "-") == "-":
 			# Are we the host machine?
-			if self.host_config.get("hostname", "") == gethostname():
+			if self.is_host_machine():
 				default_ip = "127.0.0.1"
 
 			# Or are we the virtual machine?
@@ -114,6 +126,16 @@ class Client(object):
 		# Create monitor
 		self.monitor = Monitor(host)
 		return True
+
+
+	def is_host_machine(self):
+		"""
+		Determine if current machine is the host.
+
+		Returns:
+			bool
+		"""
+		return self.host_config.get("hostname", "") == gethostname()
 
 
 	def monitor_command(self, func):
@@ -223,6 +245,22 @@ class Client(object):
 
 		else:
 			print(constants.CLIENT_UNKNOWN_COMMAND)
+
+
+	def command_info(self, args):
+		"""
+		Print info about current session.
+
+		Args:
+			args (list): List arguments
+		"""
+		print(constants.CLIENT_INFO % {
+			"VERSION": constants.VERSION,
+			"CONFIG_FILEPATH": self.config_filepath,
+			"HOME_DIR": os.path.expanduser("~"),
+			"BASE_DIR": os.path.dirname(__file__),
+			"CURRENT_DIR": os.getcwd()
+		})
 
 
 	def command_version(self, args):
@@ -404,7 +442,9 @@ class Client(object):
 			args = self.device_names_to_ids(args)
 		
 		# Add USB device
-		if not self.monitor_command(lambda m: m.add_usb(args)):
+		if self.monitor_command(lambda m: m.add_usb(args)):
+			print(constants.CLIENT_ADDED % args)
+		else:
 			print(constants.CLIENT_CANNOT_ADD % args)
 
 
@@ -425,5 +465,7 @@ class Client(object):
 			args = self.device_names_to_ids(args)
 
 		# Remove USB device
-		if not self.monitor_command(lambda m: m.remove_usb(args)):
+		if self.monitor_command(lambda m: m.remove_usb(args)):
+			print(constants.CLIENT_REMOVED % args)
+		else:
 			print(constants.CLIENT_CANNOT_REMOVE % args)

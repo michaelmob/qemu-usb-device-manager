@@ -1,6 +1,8 @@
-from .src.monitor import Monitor
-from .src.client import Client
-from .src.constants import VERSION
+#!/usr/bin/env python3
+from .constants import VERSION
+from .main import main as run
+from .monitor import Monitor
+from .client import Client
 
 
-__all__ = ["VERSION", "Monitor", "Client", "usb_dm"]
+__all__ = ["VERSION", "run", "Monitor", "Client"]
