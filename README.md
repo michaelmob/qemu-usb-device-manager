@@ -18,6 +18,12 @@
 * QEMU 2.10.0 or higher
 
 ## Setup
+**Host machine setup**
+You must include the monitor flag in your QEMU command, or the equivalent in your Libvirt config.
+```
+-monitor telnet:0.0.0.0:7101,server,nowait,nodelay
+```
+
 **Installation method**  
 *Installing with escalated privilege (e.g. sudo) creates a quick access executable `usb_dm` for convenience.  Otherwise, you will need to find run.py of the qemu-usb-device-manager directory in your Python's site-packages.*  
 ```sh
