@@ -155,17 +155,34 @@ class Client(object):
 
 	def device_names_to_ids(self, devices):
 		"""
-		Create list of devices by searching for 'devices' values and trying to
-		find 'usb_devices_full' keys with them, otherwise use same value.
+		Create list of devices by looping through 'devices' values and trying to
+		find the keys in 'usb_devices_full'.
+
+		Ignore if not vendor and product id.
 		
 		Args:
 			devices (list): List of devices
 		"""
 		result = []
+		host_devices = self.monitor_command(lambda m: m.host_usb_devices())
+		host_ids = [device["id"] for device in host_devices]
 
 		for device in devices:
+			# named device
 			name = self.usb_devices_full.get(device)
-			result.append(name.get("id") if name else device)
+			if name:
+				id = name.get("id")
+
+			# vendor and product id
+			else:
+				id = device if ":" in device else None
+
+			# Be sure ids exist, otherwise the error message below is spat out
+			# and VM performance seems to become crippled
+			# qemu-system-x86_64: libusb_release_interface: -99 [OTHER]
+			# libusb: error [release_interface] release interface failed, error -1 errno 22
+			if id in host_ids:
+				result.append(id)
 
 		return result
 

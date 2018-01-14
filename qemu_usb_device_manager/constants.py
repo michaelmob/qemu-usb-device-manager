@@ -1,4 +1,4 @@
-VERSION = "1.1.0"  # Remember to change version in setup.py too!
+VERSION = "1.1"  # Remember to change version in setup.py too!
 CONFIG_NAME_SHORT = "config"
 CONFIG_NAME_LONG = "qemu_usb_dm_config"
 
@@ -29,22 +29,23 @@ Type 'help' for a list of commands.
 """.strip()
 CLIENT_HELP = \
 """
-- help - List commands
-- exit - Exit limited monitor
-- wait [seconds] - Wait for an amount of time
-- reload - Reload config file
-- update - Update config file from 'configuration-url'
-- monitor - Show monitor information
-- list - List USB devices connected to virtual machine
-- hostlist - List USB devices connected to host
-- set - Show available virtual machines
-- set [name] - Set active machine by name
-- add - Add all USB devices
-- add [id] - Add USB device by id
-- add [name] - Add USB device by specified name
-- remove - Remove all USB devices
-- remove [id] - Remove USB device by id
-- remove [name] - Remove USB device by specified name
+- help | List commands
+- version | Display version
+- exit | Exit limited monitor
+- wait [seconds] | Wait for an amount of time
+- reload | Reload config file
+- update | Update config file from 'configuration-url'
+- monitor | Show monitor information
+- list | List USB devices connected to virtual machine
+- hostlist | List USB devices connected to host machine
+- set | Show available virtual machines
+- set [name] | Set active machine by name
+- add | Add all USB devices
+- add [id] | Add USB device by id
+- add [name] | Add USB device by specified name
+- remove | Remove all USB devices
+- remove [id] | Remove USB device by id
+- remove [name] | Remove USB device by specified name
 """.strip()
 CLIENT_INFO = \
 """

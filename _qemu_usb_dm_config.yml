@@ -11,7 +11,7 @@ usb-devices:
   keyboard:
     id: '1b1c:1b09'
 
-  # Devices can be named anything.
+  # Devices can be named anything but names must be different.
   mouse:
     id: '046d:c52b'
 
@@ -31,13 +31,15 @@ usb-devices:
 
 virtual-machines:
   # Connect on port 7101, IP address will be determined based on machine.
+  # Current virtual machine can be automatically set by including its hostname.
   windows-vm-1:
     monitor: ':7101'
+    hostname: 'win-vm'
 
   # Connect using an IP address on port 7101.
   windows-vm-2:
     monitor: '192.168.1.5:7101'
 
-  # Connect using a hostname on port 7103.
+  # Connect using the host's hostname on port 7103.
   windows-vm-2:
     monitor: 'pc:7103'

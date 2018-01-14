@@ -103,22 +103,23 @@ class Monitor(object):
 			device (str): Device ID
 		"""
 		data = self.usb_devices_more()
-
 		result = True
 
+		# Single device
 		if type(device) is str:
-			device = self.default_usb_type(device)
 			if not self.id_is_connected(device):
-				self.__write("usb_add %s" % device)
+				args = "usb-host,vendorid=0x%s,productid=0x%s,id=%s" % (
+					self.device_ids(device)
+				)
+				self.__write("device_add " + args)
 			else:
 				return False
 
+		# Multiple devices
 		elif type(device) is list:
-			for _id in device:
-				_id = self.default_usb_type(_id)
-				if not self.id_is_connected(_id, data):
-					self.__write("usb_add %s" % _id)
-				else:
+			devices = device
+			for device in devices:
+				if not self.add_usb(device):
 					result = False
 
 		return (not "could not" in self.__read()) if result else result
@@ -131,36 +132,38 @@ class Monitor(object):
 		Args:
 			device (str): Device ID
 		"""
-		if type(device) is str:
-			self.__write("usb_del %s" % self.id_to_device(device))
+		data = self.usb_devices_more()
 
+		# Single device
+		if type(device) is str:
+			#self.__write("usb_del %s" % self.id_to_device(device))
+			args = self.device_ids(device)[2]
+			self.__write("device_del " + args)
+
+		# Multiple devices
 		elif type(device) is list:
-			data = self.usb_devices_more()
-			for _id in device:
-				self.__write("usb_del %s" % self.id_to_device(_id, data))
+			devices = device
+			for device in devices:
+				self.remove_usb(device)
 
 		return not "could not" in self.__read()
 
 
-	def default_usb_type(self, value):
-		"""
-		Defaults prefixes for usb_type: host:, serial:, disk: etc...
 
-		Values split by semicolon with both elements having 4 characters will
-		automatically be prefixed with "host:"
-		
-		Args:
-			value (str): Device ID
-		
-		Returns:
-			str: Manipulated device ID
+	def device_ids(self, value):
 		"""
-		if ":" in value:
-			_value = value.split(":")
-			if not (len(_value) > 2 or _value[0] == "disk"):
-				if len(_value[0]) == 4 and len(_value[1]) == 4:
-					return "host:" + value
-		return value
+		Split vendor id and product id.
+
+		Args:
+			value (str): device vendor and product id
+
+		Returns:
+			tuple: (vendor id, product id, cosmetic id)
+		"""
+		vendor_id, product_id = tuple(value.split(":")[-2:])
+		cosmetic_id = "device-%s-%s" % (vendor_id, product_id)
+		return (vendor_id, product_id, cosmetic_id)
+
 
 
 	def id_to_device(self, value, data=None):

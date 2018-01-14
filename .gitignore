@@ -98,3 +98,6 @@ ENV/
 qemu_usb_dm_config.*
 config.*
 *.zip
+
+# sublime
+*.sublime-*
