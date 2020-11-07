@@ -24,7 +24,7 @@ class Client(object):
 
 	def __init__(self, machine_name, config_filepath, log_filepath=None):
 		"""
-		Load configuration from yaml/json file.
+		Load configuration from yaml file.
 		
 		Args:
 			config_filepath (str): Configuration file path
@@ -47,7 +47,7 @@ class Client(object):
 		"""
 		try:
 			with open(self.config_filepath) as f:
-				self.config = yaml.load(f)
+				self.config = yaml.load(f, Loader=yaml.FullLoader)
 		except Exception as exc:
 			logging.exception(exc)
 			return False
@@ -317,7 +317,7 @@ class Client(object):
 	def command_update(self, args):
 		"""
 		Download url set in 'configuration-url' and attempt to parse with YAML.
-		If the new config is valid JSON/YAML then replace current config.
+		If the new config is valid YAML then replace current config.
 		
 		Args:
 			args (list): List arguments
