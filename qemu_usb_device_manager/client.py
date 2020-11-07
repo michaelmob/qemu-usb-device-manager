@@ -105,7 +105,7 @@ class Client(object):
 		# If monitor_host starts with a colon, we should guess which IP to use
 		# when it's not, Monitor IP:Port is probably specified by user
 		if monitor_host[0] != ":":
-			self.monitor = Monitor(host)
+			self.monitor = Monitor(monitor_host)
 			return True
 
 		# Did user define their own monitor host?
@@ -200,7 +200,7 @@ class Client(object):
 
 	def run_command(self, text):
 		"""
-		Run command for monitor 
+		Run command for monitor
 		
 		Args:
 			text (str): Command
