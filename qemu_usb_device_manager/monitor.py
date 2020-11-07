@@ -102,7 +102,6 @@ class Monitor(object):
 		Args:
 			device (str): Device ID
 		"""
-		data = self.usb_devices_more()
 		result = True
 
 		# Single device
@@ -132,11 +131,9 @@ class Monitor(object):
 		Args:
 			device (str): Device ID
 		"""
-		data = self.usb_devices_more()
 
 		# Single device
 		if type(device) is str:
-			#self.__write("usb_del %s" % self.id_to_device(device))
 			args = self.device_ids(device)[2]
 			self.__write("device_del " + args)
 
@@ -165,41 +162,17 @@ class Monitor(object):
 		return (vendor_id, product_id, cosmetic_id)
 
 
-
-	def id_to_device(self, value, data=None):
-		"""
-		Find device id (0.0) from vendor and product id by comparing host device
-		names to connected virtual machine device names.
-		
-		Args:
-			value (str): Vendor:Product ID
-			data (bool, optional): Prefetched data of .host_usb_devices_more()
-
-		Returns:
-			Device if found, otherwise it returns original value
-		"""
-		if not data:
-			data = self.usb_devices_more()
-
-		if value.startswith("host:"):
-			value = value[5:]
-
-		return next((d["device"] for d in data if d["id"] == value), value)
-		
-
-	def id_is_connected(self, value, data=None):
+	def id_is_connected(self, value):
 		"""
 		Test if device is connected by vendor and product id.
 		
 		Args:
 			value (str): Vendor:Product ID
-			data (bool, optional): Prefetched data of .host_usb_devices_more()
 
 		Returns:
 			bool, connected or not
 		"""
-		if not data:
-			data = self.usb_devices_more()
+		data = self.usb_devices_more()
 
 		if value.startswith("host:"):
 			value = value[5:]
