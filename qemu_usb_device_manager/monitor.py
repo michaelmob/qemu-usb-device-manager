@@ -1,25 +1,33 @@
 from time import sleep
 from sys import stderr
 from telnetlib import Telnet
+from . import constants
+
+
 
 class Monitor(object):
-	"""Monitor class is a very limited wrapper for the QEMU Monitor.
+	"""
+	Monitor class is a very limited wrapper for the QEMU Monitor.
 	It connects through telnet to control the virtual machine's monitor.
 	"""
-	is_connected = False
 
 	def __init__(self, host):
-		"""Initializer 
+		"""
+		Initialize Monitor class.
 		
 		Args:
 			host (str): IP address and Port of Telnet monitor
 		"""
 		host = host.split(":")
-		self.host = (host[0], int(host[1]) if len(host[1]) > 1 else 23)
+		port = int(host[1]) if host[1].isnumeric() else 23
+
+		self.host = (host[0], port)
+		self.is_connected = False
 		
 
 	def connect(self, retry=True, retry_wait=0.25, max_retries=5, _retries=0):
-		"""Connect to Telnet monitor 
+		"""
+		Connect to Telnet monitor.
 		
 		Args:
 			retry (bool, optional): Attempt retry if connection is not successful
@@ -30,11 +38,11 @@ class Monitor(object):
 			return
 
 		try:
-			self.telnet = Telnet(self.host[0], self.host[1])
+			self.telnet = Telnet(*self.host)
 
 			if not "QEMU" in self.__read(True):
 				if not retry or _retries >= max_retries:
-					raise ConnectionAbortedError("Monitor is already in use.")
+					raise ConnectionAbortedError(constants.MONITOR_IN_USE)
 		
 				sleep(retry_wait)
 				return self.connect(retry, max_retries, _retries + 1)
@@ -47,16 +55,18 @@ class Monitor(object):
 
 
 	def disconnect(self):
-		"""Close Telnet monitor socket 
+		"""
+		Close Telnet monitor socket.
 		"""
 		self.telnet.close()
 		self.is_connected = False
 		sleep(0.1)
-		return self.is_connected
+		return not self.is_connected
 
 
 	def __write(self, value):
-		"""Write string to monitor 
+		"""
+		Write string to monitor.
 		
 		Args:
 			value (str): Text to write to telnet monitor
@@ -71,7 +81,8 @@ class Monitor(object):
 
 
 	def __read(self, _force_read=False):
-		"""Read from monitor 
+		"""
+		Read from monitor.
 		"""
 		if not self.is_connected and not _force_read:
 			return ""
@@ -84,74 +95,81 @@ class Monitor(object):
 
 
 	def add_usb(self, device):
-		"""Add USB device by vendor:product id
-		Verify that device is not already added
+		"""
+		Add USB device by vendor:product id.
+		Verify that device is not already added.
 		
 		Args:
 			device (str): Device ID
 		"""
 		data = self.usb_devices_more()
-
 		result = True
 
+		# Single device
 		if type(device) is str:
-			device = self.default_usb_type(device)
 			if not self.id_is_connected(device):
-				self.__write("usb_add %s" % device)
+				args = "usb-host,vendorid=0x%s,productid=0x%s,id=%s" % (
+					self.device_ids(device)
+				)
+				self.__write("device_add " + args)
 			else:
 				return False
 
+		# Multiple devices
 		elif type(device) is list:
-			for _id in device:
-				_id = self.default_usb_type(_id)
-				if not self.id_is_connected(_id, data):
-					self.__write("usb_add %s" % _id)
-				else:
+			devices = device
+			for device in devices:
+				if not self.add_usb(device):
 					result = False
 
 		return (not "could not" in self.__read()) if result else result
 
 
 	def remove_usb(self, device):
-		"""Remove USB device by vendor id 
+		"""
+		Remove USB device by vendor id.
 		
 		Args:
 			device (str): Device ID
 		"""
-		if type(device) is str:
-			self.__write("usb_del %s" % self.id_to_device(device))
+		data = self.usb_devices_more()
 
+		# Single device
+		if type(device) is str:
+			#self.__write("usb_del %s" % self.id_to_device(device))
+			args = self.device_ids(device)[2]
+			self.__write("device_del " + args)
+
+		# Multiple devices
 		elif type(device) is list:
-			data = self.usb_devices_more()
-			for _id in device:
-				self.__write("usb_del %s" % self.id_to_device(_id, data))
+			devices = device
+			for device in devices:
+				self.remove_usb(device)
 
 		return not "could not" in self.__read()
 
 
-	def default_usb_type(self, value):
-		"""Defaults for usb_type; host:, serial:, disk: etc...
 
-		Values split by semicolon with both elements having 4 characters will
-		automatically be prefixed with "host:"
-		
-		Args:
-			value (str): Device ID
-		
-		Returns:
-			str: Manipulated device ID
+	def device_ids(self, value):
 		"""
-		if ":" in value:
-			_value = value.split(":")
-			if not (len(_value) > 2 or _value[0] == "disk"):
-				if len(_value[0]) == 4 and len(_value[1]) == 4:
-					return "host:" + value
-		return value
+		Split vendor id and product id.
+
+		Args:
+			value (str): device vendor and product id
+
+		Returns:
+			tuple: (vendor id, product id, cosmetic id)
+		"""
+		vendor_id, product_id = tuple(value.split(":")[-2:])
+		cosmetic_id = "device-%s-%s" % (vendor_id, product_id)
+		return (vendor_id, product_id, cosmetic_id)
+
 
 
 	def id_to_device(self, value, data=None):
-		"""Find device id (0.0) from vendor and product id by comparing
-		host device names to connected virtual machine device names.
+		"""
+		Find device id (0.0) from vendor and product id by comparing host device
+		names to connected virtual machine device names.
 		
 		Args:
 			value (str): Vendor:Product ID
@@ -170,7 +188,8 @@ class Monitor(object):
 		
 
 	def id_is_connected(self, value, data=None):
-		"""Find if device is connected by vendor and product id.
+		"""
+		Test if device is connected by vendor and product id.
 		
 		Args:
 			value (str): Vendor:Product ID
@@ -189,7 +208,8 @@ class Monitor(object):
 		
 
 	def usb_devices(self):
-		"""List USB devices from monitor
+		"""
+		List USB devices from monitor.
 		"""
 		if not self.is_connected:
 			return []
@@ -221,7 +241,8 @@ class Monitor(object):
 
 
 	def usb_devices_more(self):
-		"""Show all USB device information from connected devices
+		"""
+		Show all USB device information from connected devices.
 		"""
 		return [
 			device for device in self.host_usb_devices_more()
@@ -230,7 +251,8 @@ class Monitor(object):
 
 
 	def host_usb_devices(self):
-		"""List USB devices connected to host
+		"""
+		List USB devices connected to host.
 		"""
 		if not self.is_connected:
 			return []
@@ -270,9 +292,10 @@ class Monitor(object):
 
 
 	def host_usb_devices_more(self):
-		"""Show all USB device information
 		"""
-		host_devices, vm_devices = (self.host_usb_devices(), self.usb_devices())
+		Show all USB device along with their details.
+		"""
+		host_devices, vm_devices = self.host_usb_devices(), self.usb_devices()
 
 		# Loop through both: host_device and vm_devices; compare product names
 		# and combine dictionaries
@@ -280,4 +303,5 @@ class Monitor(object):
 			for vm_device in vm_devices:
 				if vm_device.get("product", 0) == host_device.get("product", 1):
 					host_device.update(vm_device)
+
 		return host_devices

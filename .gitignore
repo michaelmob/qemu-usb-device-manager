@@ -6,6 +6,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 config.json
+config.yml
+config.yaml
 
 # C extensions
 *.so
@@ -91,3 +93,11 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# config
+qemu_usb_dm_config.*
+config.*
+*.zip
+
+# sublime
+*.sublime-*

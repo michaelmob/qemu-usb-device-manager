@@ -1,0 +1,45 @@
+---
+configuration-url: 'https://example.com/path_to_shared_config.yml'  # Optional
+
+
+host-machine:
+  hostname: pc
+
+
+usb-devices:
+  # An example device.
+  keyboard:
+    id: '1b1c:1b09'
+
+  # Devices can be named anything but names must be different.
+  mouse:
+    id: '046d:c52b'
+
+  # A device can be fixed to a VM using the 'add only' action.
+  # The device will never be automatically removed in bulk remove situations.
+  # Device can still be removed if .
+  microphone:
+    id: '17a0:0310'
+    action: 'add only'
+
+
+  # A device can be ignored using the 'ignore' action.
+  external-harddrive:
+    id: '1d33:d623'
+    action: 'ignore'
+
+
+virtual-machines:
+  # Connect on port 7101, IP address will be determined based on machine.
+  # Current virtual machine can be automatically set by including its hostname.
+  windows-vm-1:
+    monitor: ':7101'
+    hostname: 'win-vm'
+
+  # Connect using an IP address on port 7101.
+  windows-vm-2:
+    monitor: '192.168.1.5:7101'
+
+  # Connect using the host's hostname on port 7103.
+  windows-vm-2:
+    monitor: 'pc:7103'
