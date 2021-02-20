@@ -23,7 +23,7 @@ class Monitor(object):
 
 		self.host = (host[0], port)
 		self.is_connected = False
-		
+
 
 	def connect(self, retry=True, retry_wait=0.25, max_retries=5, _retries=0):
 		"""
@@ -100,9 +100,8 @@ class Monitor(object):
 		Verify that device is not already added.
 		
 		Args:
-			device (str): Device ID
+			device (Union[str, list]): Device ID
 		"""
-		data = self.usb_devices_more()
 		result = True
 
 		# Single device
@@ -130,14 +129,15 @@ class Monitor(object):
 		Remove USB device by vendor id.
 		
 		Args:
-			device (str): Device ID
+			device (Union[str, list]): Device ID
 		"""
-		data = self.usb_devices_more()
 
 		# Single device
 		if type(device) is str:
-			#self.__write("usb_del %s" % self.id_to_device(device))
-			args = self.device_ids(device)[2]
+			# Prefer removing by user-supplied ID
+			args = self.device_to_userid(device)
+			if args is None:
+				args = self.device_ids(device)[2]
 			self.__write("device_del " + args)
 
 		# Multiple devices
@@ -147,7 +147,6 @@ class Monitor(object):
 				self.remove_usb(device)
 
 		return not "could not" in self.__read()
-
 
 
 	def device_ids(self, value):
@@ -165,47 +164,40 @@ class Monitor(object):
 		return (vendor_id, product_id, cosmetic_id)
 
 
-
-	def id_to_device(self, value, data=None):
+	def device_to_userid(self, value):
 		"""
-		Find device id (0.0) from vendor and product id by comparing host device
-		names to connected virtual machine device names.
+		Find user-supplied ID (if any) from vendor and product id
 		
 		Args:
 			value (str): Vendor:Product ID
-			data (bool, optional): Prefetched data of .host_usb_devices_more()
-
 		Returns:
-			Device if found, otherwise it returns original value
+			User ID if found, otherwise it returns None
 		"""
-		if not data:
-			data = self.usb_devices_more()
+		data = self.usb_devices_more()
 
 		if value.startswith("host:"):
 			value = value[5:]
 
-		return next((d["device"] for d in data if d["id"] == value), value)
-		
+		return next((d.get("userid", None) for d in data if d["id"] == value), None)
 
-	def id_is_connected(self, value, data=None):
+
+	def id_is_connected(self, value):
 		"""
 		Test if device is connected by vendor and product id.
 		
 		Args:
 			value (str): Vendor:Product ID
-			data (bool, optional): Prefetched data of .host_usb_devices_more()
 
 		Returns:
 			bool, connected or not
 		"""
-		if not data:
-			data = self.usb_devices_more()
+		data = self.usb_devices_more()
 
 		if value.startswith("host:"):
 			value = value[5:]
 
 		return any(d["id"] == value for d in data)
-		
+
 
 	def usb_devices(self):
 		"""
@@ -232,7 +224,12 @@ class Monitor(object):
 			# Add info about device to dict
 			for element in line:
 				key = element.lower().split(" ")[0]
-				device[key] = element[len(key)+1:]
+
+				# ID: means the device has user-supplied ID on the host
+				if key == "id:":
+					device["userid"] = element[4:]
+				else:
+					device[key] = element[len(key)+1:]
 
 			# Add device to the result
 			result.append(device)
