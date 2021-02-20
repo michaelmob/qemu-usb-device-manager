@@ -17,7 +17,7 @@ def main():
 	parser = ArgumentParser(description="Limited QEMU Monitor Wrapper for USB management")
 	parser.add_argument("--name", "--set", "-n", "-s", help="Name of virtual machine")
 	parser.add_argument("--command", "-c", help="Command", nargs="*")
-	parser.add_argument("--config", "--conf", help="YAML/JSON config file location", nargs="?")
+	parser.add_argument("--config", "--conf", help="YAML config file location", nargs="?")
 	parser.add_argument("--log", help="Log file location", nargs="?")
 	args = parser.parse_args()
 
@@ -28,7 +28,7 @@ def main():
 		config_filepath = args.config
 
 	else:
-		extensions = (".yml", ".yaml", ".json")
+		extensions = (".yml", ".yaml")
 
 		# Attempt to find local config
 		config_filepath = find_file(
